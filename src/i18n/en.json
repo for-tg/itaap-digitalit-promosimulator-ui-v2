@@ -1,0 +1,662 @@
+{
+  "app": {
+    "title": "Promo Effectiveness Simulator",
+    "shortTitle": "Promo Simulator",
+    "subtitle": "Revenue Growth Management",
+    "backToProjects": "Back to projects",
+    "activeProjectContext": "Active project context",
+    "philipsBrand": "Philips brand",
+    "admin": "Admin",
+    "regionAccess": "Region Access",
+    "rgmAndPhcat": "RGM and PHCAT",
+    "toggleColourTheme": "Toggle colour theme"
+  },
+
+  "navigation": {
+    "historicalView": "Historical View",
+    "optimizationConfiguration": "Optimization Configuration",
+    "optimizedView": "Optimized View"
+  },
+
+  "languageSelector": {
+    "selectedLanguage": "Selected language: {{language}}",
+    "selectLanguage": "Select language",
+    "searchLanguages": "Search languages",
+    "noLanguagesFound": "No languages found"
+  },
+
+  "filters": {
+    "market": "Market",
+    "mag": "MAG",
+    "retailer": "Retailer",
+    "scenario": "Scenario",
+    "language": "Language",
+    "theme": "Theme",
+    "year": "Year",
+    "sku": "SKU",
+    "all": "All",
+    "top20": "Top 20",
+    "top50": "Top 50",
+    "topN": "Top N",
+    "secondaryMetric": "Secondary metric",
+    "heatmapMetric": "Heat map metric"
+  },
+
+  "tabs": {
+    "portfolio": "Portfolio",
+    "skuTrend": "SKU trend",
+    "heatmap": "Heat Map",
+    "summary": "Summary",
+    "elasticity": "Elasticity",
+    "calendar": "Calendar",
+    "volume": "Volume",
+    "promoEffectiveness": "Promo Effectiveness",
+    "deepDive": "Deep Dive"
+  },
+
+  "heatmap": {
+    "bandRowIsMedian": "Band row = median across SKUs in that tier"
+  },
+
+  "elasticityHeatmap": {
+    "legend": "Low ← elasticity |β| → High",
+    "noData": "No data this week",
+    "beta": "Elasticity |β|",
+    "highElasticity": "High — promos drive strong volume response",
+    "lowElasticity": "Low — price cuts have limited volume impact"
+  },
+
+  "volume": {
+    "baselineUnits": "Baseline units",
+    "incrementalUnits": "Incremental units",
+    "incrUnitsPositive": "Incremental (positive)",
+    "incrUnitsNegative": "Incremental (negative)",
+    "totalUnits": "Total units",
+    "totalIncrementalUnits": "Total incremental units",
+    "promoSpend": "Promo spend",
+    "costPerIncrUnit": "Cost per incremental unit",
+    "portfolio": "Portfolio",
+    "perSku": "Per SKU",
+    "viewScope": "View scope",
+    "selectSku": "Select a SKU above.",
+    "portfolioChartLabel": "Portfolio — Baseline + Incremental Units per Week",
+    "skuChartLabel": "Baseline + Incremental Units per Week",
+    "weekLabel": "Week {{week}}"
+  },
+
+  "metrics": {
+    "totalTurnover": "Total Turnover",
+    "turnover": "Turnover",
+    "profit": "Profit",
+    "revenue": "Revenue",
+    "promoSpend": "Promo Spend",
+    "incrementalUnits": "Incremental units",
+    "promoRoiPercent": "Promo ROI (%)",
+    "returnPerKc": "Return / Spend",
+    "promoEffectiveness": "Promo Effectiveness",
+    "impactOnIgm": "Impact on IGM",
+    "igm": "IGM",
+    "igmMargin": "IGM Margin",
+    "incrementalLift": "Incremental Lift",
+    "margin": "Margin",
+    "volume": "Volume",
+    "optimalProfit": "Optimal Profit",
+    "optimalRevenue": "Optimal Revenue",
+    "averageDiscountDepth": "Avg. Discount Depth",
+    "volumeFactor": "Volume Factor",
+    "skusInScope": "SKUs in scope",
+    "skusSelected": "SKUs selected",
+    "units": "units",
+    "add": "Add"
+  },
+
+  "descriptions": {
+    "allSkus": "all {{count}} SKUs",
+    "allSkusYear": "all {{count}} SKUs · {{year}}",
+    "historicalActual": "historical actual",
+    "actual": "actual",
+    "historicalKpiSummary": "Historical KPI summary",
+    "optimizedKpiSummary": "Optimized KPI summary",
+    "incrementalMarginPerKc": "incremental margin per Spend",
+    "promoLiftVolume": "promos lift volume +{{value}}%",
+    "recommendedPromoWeeks": "across recommended promo weeks",
+    "noPromo": "no-promo",
+    "priceReference": "Price reference",
+    "tripleNet": "Triple Net",
+    "sellOut": "Sell Out",
+    "selectedOfTotal": "{{selected}} of {{total}}",
+    "vsNoPromoBaseline": "vs. no-promo baseline",
+    "incrementalRevenuePerSpend": "incremental revenue per unit of spend"
+  },
+
+  "rail": {
+    "modeHistorical": "Historical",
+    "modeOptimalRetro": "Optimal · Retrospective",
+    "modeOptimalPlan": "Optimal · Planned"
+  },
+
+  "charts": {
+    "portfolioChart": "Portfolio chart",
+    "promoSpendAndReturnPerKc": "Promo spend & Return per Spend",
+    "promoSpendAndMetric": "Promo spend & {{metric}}",
+    "skuTrendOverTime": "SKU trend over time",
+    "showingSkusByHistoricalSpend": "Showing {{shown}} of {{total}} SKUs by historical promo spend · {{year}}",
+    "weeklyPromoSpendVsSelectedMeasure": "Weekly promo spend vs. selected measure · {{year}}",
+    "weeklyPromoSpendVsPromoRoiPercent": "Weekly promo spend (left axis) vs. Promo ROI % (right axis) for {{sku}}",
+    "weeklyPromoSpendVsIncrementalUnits": "Weekly promo spend (left axis) vs. incremental units (right axis) for {{sku}}",
+    "weeklyPromoSpendVsReturnPerKc": "Weekly promo spend (left axis) vs. Return per Spend (right axis) for {{sku}}",
+    "weeklyPromoSpendAndMetricSameAxisForSku": "Weekly promo spend and {{metric}} on the same axis Spend for {{sku}} — compare levels directly.",
+    "portfolioFootnote": "Bars: promotional spend . Line: selected measure. Return per Spend = incremental margin vs. no-promo per 1 Local Currency spent — negative means the promo returned less margin than holding list price.",
+    "promoSpendAxis": "Promo spend ",
+    "returnAxis": "Return / Spend",
+    "noWeeklyDataAvailable": "No weekly data available.",
+    "promoVolumeUpliftBySku": "Promo volume uplift by SKU",
+    "optVolumeUplift": "Optimized volume uplift by SKU",
+    "incrUnitsNoPromo": "Incremental units vs. no-promo baseline",
+    "incrUnitsRecommended": "Incremental units (recommended plan)",
+    "incrUnitsVsActual": "Incremental units from recommended plan vs. actual - {{count}} SKUs",
+    "showingSkusRankedByVolumeImpact": "Incremental units vs. no-promo baseline · {{year}} · showing {{shown}} of {{total}} SKUs, ranked by volume impact",
+    "top20ByImpact": "Top 20 by impact",
+    "top50ByImpact": "Top 50 by impact",
+    "allSkuOption": "All SKUs",
+    "volumeUpliftFootnote": "Each bar is one SKU's incremental units for the year — the extra volume the promotion drove versus the no-promo baseline. Bar colour shows efficiency: green = positive ROI, amber = marginal (-20% to 0%), red = negative ROI.",
+    "costPerUnit": "Cost per extra unit",
+    "roiPositive": "ROI positive",
+    "marginal": "Marginal",
+    "inefficient": "Inefficient",
+    "bandShownOnXAxis": "Band shown as (H) / (M) / (L) on x-axis",
+    "bar": "Bar",
+    "incrUnits": "Incr. units",
+    "optSpend": "Opt. promo Spend",
+    "portfolioAvgFallback": "No individual data — showing portfolio average",
+    "promoEffectivenessHeatmap": "Promo Effectiveness — SKU × Week",
+    "effectivenessHeatmapAriaLabel": "Heat map of promo effectiveness by SKU and week",
+    "effectivenessHeatmapFootnote": "Each cell = 1 + (incremental revenue ÷ promo spend). 1.40× means the promo drove 40% more revenue than it cost. Green = above 1.0×; red = below. Hover for spend, baseline value, incremental value, and Impact on IGM.",
+    "lowerToHigherEffectiveness": "Lower ← effectiveness → Higher",
+    "noPromoThisWeek": "No promo this week",
+    "baselineValue": "Baseline value",
+    "incrementalValue": "Incremental value",
+    "incrementalUnitsHeatmap": "Incremental Units — SKU × Week",
+    "incrementalUnitsHeatmapAriaLabel": "Heat map of incremental units by SKU and week",
+    "incrementalUnitsHeatmapFootnote": "Each cell = actual units minus baseline (no-promo) units for that SKU-week. Green = the promo sold more than baseline; red = it sold less. Hover a cell for baseline units, actual units, and Impact on IGM (the profit-based view of the same week).",
+    "lowerToHigherIncrementalUnits": "Lower ← incremental units → Higher",
+    "baselineUnits": "Baseline units",
+    "actualUnits": "Actual units",
+    "unitsVsAsp": "Units vs ASP",
+    "unitsVsAspSubtitle": "Weekly sell-out units and average selling price by band · {{year}}"
+  },
+
+  "optimization": {
+    "configurePromotionScenario": "Configure the promotion scenario",
+    "analysisType": "Analysis Type",
+    "retrospective": "Retrospective",
+    "forwardLooking": "Forward-looking",
+    "retrospectiveDescription": "Retrospective — compares vs. actual historical prices.",
+    "forwardLookingDescription": "Forward-looking — compares vs. a no-promo baseline.",
+    "resetDefaults": "Reset all settings to defaults",
+    "objective": {
+      "title": "Optimization objective",
+      "description": "Blend between profit and revenue maximisation.",
+      "balanced": "Balanced",
+      "profitRevenueBlend": "Profit ↔ Revenue Blend",
+      "profitPercentage": "{{value}}% Profit",
+      "calendarImpact": "Drives the calendar, recommendations and elasticity consistently.",
+      "optimizationPreset": "Optimization objective preset"
+    },
+
+    "guardrails": {
+      "title": "Guardrails",
+      "maxDiscountDepth": "Max Discount Depth",
+      "marginFloor": "Margin Floor",
+      "enforceMinimumMargin": "Enforce minimum margin per promo week"
+    },
+
+    "skuSelection": {
+      "title": "SKU & Time Period Selection",
+      "description": "Pick the SKUs to optimise and the period to optimise over.",
+      "selectedSkus": "Selected SKUs ({{count}})",
+      "addSku": "Add a SKU...",
+      "addLrtb": "+ all LRTB",
+      "addMrtb": "+ all MRTB",
+      "addHrtb": "+ all HRTB",
+      "period": "Period",
+      "fullYear": "Full year",
+      "loadingSkus": "Loading SKUs...",
+      "selectSku": "Select at least one SKU to run.",
+      "removeSku": "Remove SKU",
+      "selectSkus": "Select SKUs",
+      "addSelected": "Add Selected",
+      "skusAddedRunning": "{{count}} SKUs added — running will take time.",
+      "bandSkusAddedRunning": "{{count}} {{band}} SKUs added — running will take time.",
+      "planningYear": "Planning year",
+      "baseTemplateYear": "Base template year",
+      "applyYoyGrowth": "Apply YoY trend growth"
+    },
+
+    "confirmDialog": {
+      "runOptimizationBody_one": "You are about to run optimization for {{count}} SKU.",
+      "runOptimizationBody_other": "You are about to run optimization for {{count}} SKUs.",
+      "runOptimizationSubtitle": "This may take a moment depending on the SKU count and configuration.",
+      "runNow": "Run now"
+    },
+
+    "budget": {
+      "title": "Promo budget & phasing",
+      "budgetMode": "Budget Mode",
+      "constrained": "Constrained",
+      "unconstrained": "Unconstrained",
+      "referenceYear": "Reference Year",
+      "budgetVsHistorical": "Budget vs Historical",
+      "quarterlyAllocation": "Quarterly Allocation",
+      "qAllocationMode": "Quarterly allocation mode",
+      "even": "Even",
+      "matchLastYear": "Match last year",
+      "matchLastYearTooltip": "Pre-fill with last year's actual quarterly spend proportions",
+      "matchLastYearNoData": "Opens custom split — visit Historical View first to auto-populate from last year's data",
+      "showQuarter": "Show",
+      "focusAllQuarters": "Full year",
+      "focusQuarter": "{{quarter}} only"
+    }
+  },
+
+  "optimizedView": {
+    "shell": {
+      "noResultsYet": "No results yet. Run configuration first.",
+      "profitOnly": "Profit-only",
+      "revenueOnly": "Revenue-only",
+      "balancedProfit": "Balanced (50% profit)",
+      "mixedProfit": "Mixed ({{value}}% profit)"
+    },
+
+    "cards": {
+      "mode": "Mode",
+      "objective": "Objective",
+      "budget": "Budget",
+      "confidence": "Confidence",
+      "budgetUsage": "Budget Usage",
+      "marginOutcome": "Margin Outcome"
+    },
+
+    "comparison": {
+      "title": "What Changes vs Today",
+
+      "metric": "Metric",
+
+      "baseline": "Baseline",
+
+      "recommended": "Recommended",
+
+      "promoWeeks": "Promo weeks"
+    },
+
+    "recommendations": {
+      "title": "What to do next",
+      "searchSku": "Search SKU…",
+
+      "highPriority": "Definitely do",
+
+      "mediumPriority": "Worth considering",
+
+      "lowPriority": "Minor impact",
+
+      "actions": "{{count}} actions",
+
+      "moreActions": "+{{count}} more actions..."
+    },
+
+    "recommendationInsights": {
+      "title": "Why this recommendation",
+
+      "signal": "Signal {{number}}"
+    },
+
+    "elasticity": {
+      "discountDepthResponse": "Discount depth response",
+
+      "weeklyPriceElasticity": "Weekly price elasticity |β|",
+
+      "profitUplift": "Profit uplift",
+      "revenueUplift": "Revenue uplift",
+      "allSelected": "All selected",
+      "allSelectedSkus": "all selected SKUs",
+      "singleSku": "Single SKU",
+      "depthResponseSubtitle": "How deeply to promote — {{metric}} vs. discount depth · {{scope}}",
+      "weeklyElasticitySubtitle": "Higher = stronger volume response — a better week to promote · {{scope}}",
+      "upliftAxisLabel": "{{metric}} (% of base rev)",
+      "priceElasticityAxisLabel": "|β| price elasticity",
+
+      "discountDepthDescription": "How deeply to promote — profit uplift vs. discount depth · all selected SKUs",
+
+      "weeklyElasticityDescription": "Higher = stronger volume response — a better week to promote · all selected SKUs",
+
+      "discountDepthFooter": "Profit uplift (% of base revenue) vs. discount depth, across promotable weeks. The curve's peak = the margin-efficient depth.",
+      "discountDepthFooterWithMetric": "{{metric}} (% of base revenue) vs. discount depth, across promotable weeks. The curve's peak = the margin-efficient depth.",
+
+      "weeklyElasticityFooter": "Absolute price elasticity per week, median across selected SKUs with shaded min-max band. Higher = more units gained per 1% price move.",
+      "weeklyElasticityFooterSku": "Absolute price elasticity per week for {{sku}}. Higher = more units gained per 1% price move."
+    },
+
+    "calendar": {
+      "promotionalCalendar": "Promotional Calendar",
+
+      "promotionalCalendarWeeks": "Promotional Calendar — {{weeks}} weeks",
+
+      "optimized": "Optimised",
+
+      "historical": "Historical",
+
+      "compare": "Compare",
+
+      "discountDepth": "Discount depth",
+
+      "none": "None",
+
+      "deepDiscount": "Deep (40%+)",
+
+      "deepDiscountThreshold": "Deep ({{threshold}}%+)",
+
+      "compareWeekTooltip": "Wk {{week}} | Hist: {{actual}}% | Opt: {{optimized}}%",
+
+      "weekTooltip": "Wk {{week}}: {{discount}}%",
+
+      "historicalVsOptimized": "Top half = Historical · Bottom half = Optimised"
+    },
+
+    "deepDive": {
+      "title": "Deep dive",
+
+      "subtitle": "Per-SKU detail for analyst review",
+
+      "description": "All values in Local Currency. Promo ROI = incremental margin per Spend of promo spend (recommended vs. actual).",
+
+      "vs": "vs",
+
+      "baseMetric": "Base {{metric}}",
+
+      "actualMetric": "Actual {{metric}}",
+
+      "optimalMetric": "Optimal {{metric}}",
+
+      "table": {
+        "sku": "SKU",
+
+        "baseProfit": "Base Profit",
+
+        "actualProfit": "Actual Profit",
+
+        "gainVsActual": "Gain vs Actual",
+
+        "actualSpend": "Actual Spend",
+
+        "optimalSpend": "Opt Spend",
+
+        "promoRoi": "Promo ROI"
+      }
+    }
+  },
+
+  "actions": {
+    "continueToConfiguration": "Continue to configuration",
+
+    "runOptimization": "Run optimization",
+
+    "running": "Running…",
+
+    "maximize": "Maximize",
+
+    "restore": "Restore",
+
+    "clear": "Clear",
+
+    "matchActual": "Match actual",
+
+    "customSplit": "Custom split",
+
+    "apply": "Apply",
+
+    "save": "Save",
+
+    "saving": "Saving…",
+
+    "saveChanges": "Save Changes",
+
+    "cancel": "Cancel",
+
+    "close": "Close",
+
+    "reset": "Reset",
+
+    "downloadExcel": "Download Excel"
+  },
+
+  "messages": {
+    "reviewHistoricalPicture": "Reviewed the historical picture? Move on to configure the optimization.",
+
+    "skusSelected_one": "{{count}} SKU selected",
+
+    "skusSelected_other": "{{count}} SKUs selected"
+  },
+
+  "common": {
+    "english": "English",
+
+    "search": "Search",
+
+    "noData": "No data",
+
+    "loading": "Loading",
+
+    "loadingHistoricalData": "Loading historical data",
+
+    "defaultUser": "User",
+
+    "signOut": "Sign out"
+  },
+
+  "footer": {
+    "copyright": "© {{year}} Philips Promo Simulator | All Rights Reserved."
+  },
+
+  "stepper": {
+    "simulationSteps": "Simulation steps",
+    "completePreviousStepsFirst": "Complete previous steps first"
+  },
+
+  "errors": {
+    "somethingWentWrong": "Something went wrong.",
+    "unexpected": "Sorry, an unexpected error has occurred.",
+    "unknown": "Unknown error",
+    "updateProjectFailed": "Failed to update project",
+    "missingProjectScenario": "Project or scenario not found."
+  },
+
+  "access": {
+    "page": {
+      "home": "Home",
+      "description": "View and request access to Promo Simulator regions.",
+      "loading": "Loading region access information...",
+      "retry": "Retry",
+      "myActiveRegions": "My Active Regions",
+      "approved": "APPROVED",
+      "noActiveRegions": "You do not currently have access to any regions.",
+      "requestedRegions": "Requested Regions",
+      "requestedMarket": "Requested Market",
+      "requestedOn": "Requested On",
+      "pending": "PENDING",
+      "noPendingRequest": "You do not have a pending access request.",
+      "noPreviousRequests": "No previous access requests found.",
+      "regions": "Regions",
+      "user": "User",
+      "email": "Email",
+      "actions": "Actions",
+      "action": "Action",
+      "requestDate": "Request Date",
+      "status": "Status",
+      "comment": "Comment",
+      "accessRequired": "Access Required",
+      "accessRequiredMessage": "You do not have access to this application. Please submit an access request.",
+      "accessRequests": "Access Requests",
+      "noRequestFound": "No access requests found."
+    },
+
+    "request": {
+      "pendingRequest": "Pending Request",
+      "requestRegionAccess": "Request Region Access",
+      "alreadyPending": "You already have a pending request. A new request can be submitted after the current request is reviewed.",
+      "noAdditionalRegions": "There are no additional regions available to request.",
+      "submitting": "Submitting...",
+      "submitRequest": "Submit Access Request",
+      "requestHistory": "Request History",
+      "loadFailed": "Failed to load region access information",
+      "submitFailed": "Failed to submit region access request",
+      "pendingAlreadyExists": "One or more selected retailers already have a pending access request.",
+      "requestAccess": "Request Access",
+      "viewRequest": "View Request",
+      "otherAccess": "+ Other Access",
+      "submitSuccess": "Access requests submitted successfully",
+      "submitSuccessCount": "{{count}} of 1 access requests submitted",
+      "pendingReview": "Your request is currently under review. Please wait and check the status again after some time.",
+      "accessGrantedForMarket": "Access granted for this market.",
+      "requestRejected": "Request rejected",
+      "requestNotApproved": "Request was not approved."
+    },
+
+    "form": {
+      "region": "Region",
+      "country": "Country",
+      "selectRegion": "Select region",
+      "selectCountry": "Select country",
+      "selectMag": "Select MAG",
+      "selectRetailer": "Select RETAILER",
+      "countryRequiresRegion": "Enable Country once Region selected",
+      "magRequiresCountry": "Enable MAG once Country selected",
+      "retailerRequiresMAG": "Enable Retailer once MAG selected",
+      "granted": "Granted"
+    },
+
+    "admin": {
+      "title": "Region Access Administration",
+      "description": "Review and manage Promo Simulator region access.",
+      "pendingRequests": "Pending Requests ({{count}})",
+      "approvedRequests": "Approved ({{count}})",
+      "rejectedRequests": "Rejected ({{count}})",
+      "activeUsers": "Active Users ({{count}})",
+      "deletedRequests": "Deleted Requests ({{count}})",
+      "loading": "Loading region access administration...",
+      "noPendingRequests": "No pending requests found.",
+      "noApprovedRequests": "No approved requests found.",
+      "noRejectedRequests": "No rejected requests found.",
+      "noActiveUsers": "No active users found.",
+      "noRevokedAccess": "No revoked region access found.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "revoke": "Revoke",
+      "revoking": "Revoking...",
+      "accessDenied": "Access Denied",
+      "notAuthorized": "You are not authorized to access the admin page.",
+      "backToHome": "Back to Home",
+      "grantedDate": "Granted Date",
+      "approvedDate": "Approved Date",
+      "approvedBy": "Approved By",
+      "revokedDate": "Revoked Date",
+      "revokedBy": "Revoked By",
+      "revokeConfirmation": "Revoke access to {{region}} for this user?",
+      "requestApproved": "Access request approved successfully",
+      "requestRejected": "Access request rejected successfully",
+      "regionAccessRevoked": "Region access revoked successfully",
+      "loadFailed": "Failed to load administration information",
+      "approveFailed": "Failed to approve access request",
+      "rejectFailed": "Failed to reject access request",
+      "revokeFailed": "Failed to revoke region access"
+    }
+  },
+
+  "home": {
+    "createNewProject": "Create New Project",
+    "noProjectsYet": "No projects yet.",
+    "createYourFirstProject": "Create your first project",
+    "noDeletedItems": "No deleted items.",
+    "newScenarioName": "New scenario name",
+
+    "createProjectModal": {
+      "close": "Close modal",
+      "projectName": "Project Name",
+      "enterProjectName": "Enter project name",
+      "selectMarket": "Select Market",
+      "selectMarketFirst": "Select Market first",
+      "selectMagFirst": "Select MAG first",
+      "comingSoon": "coming soon",
+      "description": "Description",
+      "enterProjectDescription": "Enter project description",
+      "createProject": "Create Project",
+      "creating": "Creating..."
+    },
+
+    "tabs": {
+      "allProjects": "All Projects ({{count}})",
+      "deletedItems": "Deleted Items ({{count}})"
+    },
+
+    "table": {
+      "scenario": "SCENARIO",
+      "market": "MARKET",
+      "mag": "MAG",
+      "retailer": "RETAILER",
+      "createdOn": "CREATED ON",
+      "updatedOn": "UPDATED ON",
+      "actions": "ACTIONS"
+    },
+
+    "projectRow": {
+      "statusDraft": "Draft",
+      "statusCompleted": "Completed",
+      "statusFailed": "Failed",
+      "statusRunning": "Running",
+      "restoreProject": "Restore project",
+      "deleteProjectPermanently": "Delete project permanently",
+      "editProject": "Edit Project",
+      "deleteProject": "Delete project",
+      "restoreScenario": "Restore scenario",
+      "renameScenario": "Rename scenario",
+      "deleteScenario": "Delete scenario",
+      "deletePermanent": "Delete scenario permanently",
+      "configSaved": "Config saved",
+      "resultStored": "Result stored",
+      "popups": {
+        "projectCreated": "Project created successfully",
+        "projectCreateFailed": "Failed to create project",
+        "projectExists": "Project \"{{name}}\" already exists.",
+        "projectDeleted": "Project deleted successfully",
+        "projectPermanentlyDeleted": "Project permanently deleted after soft-delete failed",
+        "projectDeleteFailed": "Failed to delete project",
+        "projectDeleteConflict": "Project delete request conflicts with current state.",
+        "projectRestoreFailed": "Failed to restore project",
+        "projectRestoreConflict": "Project restore request conflicts with current state.",
+        "projectRestored": "Project restored successfully",
+        "projectPermanentDeleteFailed": "Failed to permanently delete project",
+        "projectPermanentDeleteConflict": "Project permanent delete request conflicts with current state.",
+        "projectUpdated": "Project updated successfully",
+        "scenarioAdded": "Scenario added successfully",
+        "scenarioAddFailed": "Failed to add scenario",
+        "scenarioExists": "Scenario \"{{name}}\" already exists in this project.",
+        "scenarioRenamed": "Scenario renamed successfully",
+        "scenarioRenameFailed": "Failed to rename scenario",
+        "scenarioDeleted": "Scenario deleted successfully",
+        "scenarioDeleteFailed": "Failed to delete scenario",
+        "scenarioDeleteConflict": "Scenario delete request conflicts with current state.",
+        "scenarioPermanentDeleteFailed": "Failed to permanently delete scenario",
+        "scenarioPermanentDeleteConflict": "Scenario permanent delete request conflicts with current state.",
+        "scenarioPermanentlyDeleted": "Scenario deleted permanently",
+        "scenarioRestoreFailed": "Failed to restore scenario",
+        "scenarioRestoreConflict": "Scenario restore request conflicts with current state.",
+        "scenarioRestored": "Scenario restored successfully"
+      }
+    },
+
+    "scenarioCount": "({{count}} Scenario)",
+    "scenarioCount_one": "({{count}} Scenario)",
+    "scenarioCount_other": "({{count}} Scenarios)",
+
+    "theme": "Theme"
+  }
+}

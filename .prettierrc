@@ -1,0 +1,22 @@
+{
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "semi": true,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "@filament/(.*$)-styles",
+    "@filament/(.*$)-react",
+    "@filament-icons/(.*$)",
+    "^[~/]",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "overrides": [
+    {
+      "files": ["*.json"],
+      "options": {
+        "trailingComma": "none"
+      }
+    }
+  ]
+}

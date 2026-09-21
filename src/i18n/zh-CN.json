@@ -1,0 +1,520 @@
+{
+  "app": {
+    "title": "促销效果模拟器",
+    "shortTitle": "促销模拟器",
+    "subtitle": "收入增长管理",
+    "backToProjects": "返回项目列表",
+    "activeProjectContext": "当前项目上下文",
+    "philipsBrand": "飞利浦品牌",
+    "admin": "管理员",
+    "regionAccess": "区域访问权限",
+    "rgmAndPhcat": "RGM 和 PHCAT",
+    "toggleColourTheme": "切换颜色主题"
+  },
+
+  "navigation": {
+    "historicalView": "历史视图",
+    "optimizationConfiguration": "优化配置",
+    "optimizedView": "优化结果"
+  },
+
+  "languageSelector": {
+    "selectedLanguage": "当前语言：{{language}}",
+    "selectLanguage": "选择语言",
+    "searchLanguages": "搜索语言",
+    "noLanguagesFound": "未找到语言"
+  },
+
+  "filters": {
+    "market": "市场",
+    "mag": "MAG",
+    "retailer": "零售商",
+    "scenario": "场景",
+    "language": "语言",
+    "theme": "主题",
+    "year": "年份",
+    "sku": "SKU",
+    "all": "全部",
+    "top20": "前 20",
+    "top50": "前 50",
+    "topN": "前 N 名",
+    "secondaryMetric": "次要指標"
+  },
+
+  "tabs": {
+    "portfolio": "产品组合",
+    "skuTrend": "SKU 趋势",
+    "summary": "摘要",
+    "elasticity": "弹性",
+    "calendar": "日历",
+    "deepDive": "深入分析"
+  },
+
+  "metrics": {
+    "totalTurnover": "总销售额",
+    "turnover": "营业额",
+    "profit": "利润",
+    "revenue": "收入",
+    "promoSpend": "促销支出",
+    "incrementalUnits": "增量销量",
+    "promoRoiPercent": "促销 ROI (%)",
+    "returnPerKc": "每单位投入回报",
+    "margin": "利润率",
+    "volume": "销量",
+    "optimalProfit": "最优利润",
+    "optimalRevenue": "最优收入",
+    "averageDiscountDepth": "平均折扣深度",
+    "volumeFactor": "销量系数",
+    "skusInScope": "范围内的 SKU",
+    "skusSelected": "已选 SKU",
+    "units": "单位",
+    "add": "添加"
+  },
+
+  "descriptions": {
+    "allSkus": "全部 {{count}} 个 SKU",
+    "allSkusYear": "全部 {{count}} 个 SKU · {{year}}",
+    "historicalActual": "历史实际值",
+    "actual": "实际值",
+    "historicalKpiSummary": "历史 KPI 摘要",
+    "optimizedKpiSummary": "优化 KPI 摘要",
+    "incrementalMarginPerKc": "每单位促销投入的增量利润",
+    "promoLiftVolume": "促销使销量提升 +{{value}}%",
+    "recommendedPromoWeeks": "在推荐促销周内",
+    "noPromo": "无促销",
+    "priceReference": "价格参考",
+    "tripleNet": "三重净额",
+    "sellOut": "售罄",
+    "selectedOfTotal": "{{selected}} / {{total}}"
+  },
+
+  "charts": {
+    "portfolioChart": "产品组合图表",
+    "promoSpendAndReturnPerKc": "促销支出与每单位投入回报",
+    "promoSpendAndMetric": "促销支出与{{metric}}",
+    "skuTrendOverTime": "SKU 趋势变化",
+    "showingSkusByHistoricalSpend": "显示 {{shown}} / {{total}} 个 SKU（按历史促销支出排序）· {{year}}",
+    "weeklyPromoSpendVsSelectedMeasure": "每周促销支出与所选指标 · {{year}}",
+    "weeklyPromoSpendVsPromoRoiPercent": "{{sku}} 的每周促销支出（左轴）与促销 ROI %（右轴）",
+    "weeklyPromoSpendVsIncrementalUnits": "{{sku}} 的每周促销支出（左轴）与增量销量（右轴）",
+    "weeklyPromoSpendVsReturnPerKc": "{{sku}} 的每周促销支出（左轴）与每单位投入回报（右轴）",
+    "weeklyPromoSpendAndMetricSameAxisForSku": "{{sku}} 每周促销支出与 {{metric}} 同轴显示，可直接比较数值水平",
+    "portfolioFootnote": "柱形图：促销支出。折线图：选定指标。每单位投入回报 = 相对于无促销的增量利润 ÷ 每单位促销支出 — 负数表示促销带来的利润比保持原价还少",
+    "promoSpendAxis": "促销支出",
+    "returnAxis": "每单位投入回报",
+    "noWeeklyDataAvailable": "暂无每周数据。",
+    "promoVolumeUpliftBySku": "按 SKU 展示促销销量提升",
+    "optVolumeUplift": "按 SKU 展示优化后销量提升",
+    "incrementalUnitsNoPromoBaseline": "相较无促销基线的增量销量",
+    "incrUnitsRecommended": "增量销量（推荐方案）",
+    "incrUnitsVsActual": "推荐方案相较实际的增量销量 - {{count}} 个 SKU",
+    "showingSkusRankedByVolumeImpact": "相较无促销基线的增量销量 · {{year}} · 显示 {{shown}} / {{total}} 个 SKU，按销量影响排序",
+    "top20ByImpact": "按影响排序前 20",
+    "top50ByImpact": "按影响排序前 50",
+    "allSkuOption": "全部 SKU",
+    "volumeUpliftFootnote": "每个柱形代表一个 SKU 在全年由促销带来的增量销量，即相较无促销基线增加的销量。柱形颜色表示效率：绿色 = ROI 为正，琥珀色 = 边际（-20% 到 0%），红色 = ROI 为负。",
+    "costPerUnit": "每个额外单位成本",
+    "roiPositive": "ROI 为正",
+    "marginal": "边际",
+    "inefficient": "低效",
+    "bandShownOnXAxis": "X 轴上以 (H) / (M) / (L) 显示分组",
+    "bar": "柱形",
+    "incrUnits": "增量销量",
+    "optSpend": "优化促销支出",
+    "portfolioAvgFallback": "无单独数据 — 显示组合平均值"
+  },
+
+  "optimization": {
+    "configurePromotionScenario": "配置促销场景",
+    "analysisType": "分析类型",
+    "retrospective": "回溯分析",
+    "forwardLooking": "前瞻分析",
+    "retrospectiveDescription": "回溯分析，并与历史实际价格进行对比。",
+    "forwardLookingDescription": "前瞻性 — 与没有促销的基线相比。",
+    "resetDefaults": "将所有设置重置为默认值",
+
+    "objective": {
+      "title": "优化目标",
+      "description": "在利润最大化与收入最大化之间取得平衡。",
+      "balanced": "平衡",
+      "profitRevenueBlend": "利润 ↔ 收入平衡",
+      "profitPercentage": "利润权重 {{value}}%",
+      "calendarImpact": "此设置将统一应用于促销日历、推荐方案和弹性分析。",
+      "optimizationPreset": "优化目标预设"
+    },
+
+    "guardrails": {
+      "title": "约束条件",
+      "maxDiscountDepth": "最大折扣深度",
+      "marginFloor": "最低利润率",
+      "enforceMinimumMargin": "每个促销周均须满足最低利润率约束"
+    },
+
+    "skuSelection": {
+      "title": "SKU 与时间范围选择",
+      "description": "选择需要优化的 SKU 及优化时间范围。",
+      "selectedSkus": "已选 SKU（{{count}}）",
+      "addSku": "添加 SKU...",
+      "addLrtb": "+ 全部 LRTB",
+      "addMrtb": "+ 全部 MRTB",
+      "addHrtb": "+ 全部 HRTB",
+      "period": "期间",
+      "fullYear": "全年",
+      "loadingSkus": "正在加载SKU...",
+      "selectSku": "请至少选择一个SKU以运行。",
+      "removeSku": "移除SKU",
+      "selectSkus": "选择 SKU",
+      "addSelected": "添加所选项",
+      "skusAddedRunning": "已添加 {{count}} 个SKU — 运行将需要一些时间。",
+      "bandSkusAddedRunning": "已添加 {{count}} 个{{band}} SKU — 运行将需要一些时间。",
+      "planningYear": "规划年份",
+      "baseTemplateYear": "基础模板年份",
+      "applyYoyGrowth": "应用同比增长趋势"
+    },
+
+    "confirmDialog": {
+      "runOptimizationBody_one": "您即将为 {{count}} 个SKU运行优化。",
+      "runOptimizationBody_other": "您即将为 {{count}} 个SKU运行优化。",
+      "runOptimizationSubtitle": "根据SKU数量和配置，这可能需要一些时间。",
+      "runNow": "立即运行"
+    },
+
+    "budget": {
+      "title": "促销预算与分配",
+      "budgetMode": "预算模式",
+      "constrained": "受约束",
+      "unconstrained": "不受约束",
+      "referenceYear": "参考年份",
+      "budgetVsHistorical": "预算与历史值对比",
+      "quarterlyAllocation": "季度分配",
+      "qAllocationMode": "季度分配模式",
+      "even": "平均分配"
+    }
+  },
+
+  "optimizedView": {
+    "shell": {
+      "noResultsYet": "暂无结果。请先运行配置。",
+      "profitOnly": "仅利润",
+      "revenueOnly": "仅收入",
+      "balancedProfit": "平衡（50% 利润）",
+      "mixedProfit": "混合（{{value}}% 利润）"
+    },
+
+    "cards": {
+      "mode": "模式",
+      "objective": "目标",
+      "budget": "预算",
+      "confidence": "置信度",
+      "budgetUsage": "预算使用率",
+      "marginOutcome": "利润表现"
+    },
+    "comparison": {
+      "title": "与当前情况相比的变化",
+      "metric": "指标",
+      "baseline": "基准值",
+      "recommended": "推荐值",
+      "promoWeeks": "促销周数"
+    },
+    "recommendations": {
+      "title": "下一步建议",
+      "highPriority": "强烈建议",
+      "mediumPriority": "建议考虑",
+      "lowPriority": "影响较小",
+      "actions": "{{count}} 项建议行动",
+      "moreActions": "+{{count}} 项更多操作..."
+    },
+    "recommendationInsights": {
+      "title": "推荐原因",
+      "signal": "信号 {{number}}"
+    },
+
+    "elasticity": {
+      "discountDepthResponse": "折扣深度响应",
+      "weeklyPriceElasticity": "每周价格弹性 |β|",
+      "profitUplift": "利润提升",
+      "revenueUplift": "收入提升",
+      "allSelected": "全部已选",
+      "allSelectedSkus": "所有已选 SKU",
+      "singleSku": "单个 SKU",
+      "depthResponseSubtitle": "促销深度与{{metric}}的关系 · {{scope}}",
+      "weeklyElasticitySubtitle": "数值越高，表示销量对价格变动的响应越强 · {{scope}}",
+      "upliftAxisLabel": "{{metric}}（占基础收入的百分比）",
+      "priceElasticityAxisLabel": "|β| 价格弹性",
+      "discountDepthDescription": "促销深度与利润提升的关系 · 所有已选 SKU",
+      "weeklyElasticityDescription": "数值越高，表示销量对价格变动的响应越强。",
+      "discountDepthFooter": "利润提升（占基准收入的百分比）与折扣深度的关系曲线；峰值代表利润效率最高的折扣深度。",
+      "discountDepthFooterWithMetric": "{{metric}}（占基准收入的百分比）与折扣深度的关系曲线；峰值代表利润效率最高的折扣深度。",
+      "weeklyElasticityFooter": "每周绝对价格弹性，显示中位数以及最小值至最大值区间。数值越高，表示价格每变动 1% 时，销量的变化幅度越大。",
+      "weeklyElasticityFooterSku": "{{sku}} 的每周绝对价格弹性。数值越高，表示价格每变动 1% 时，销量的变化幅度越大。"
+    },
+
+    "calendar": {
+      "promotionalCalendar": "促销日历",
+      "promotionalCalendarWeeks": "促销日历 · {{weeks}} 周",
+      "optimized": "优化后",
+      "historical": "历史",
+      "compare": "对比",
+      "discountDepth": "折扣深度",
+      "none": "无",
+      "deepDiscount": "深度折扣（40% 以上）",
+      "deepDiscountThreshold": "深度折扣（{{threshold}}% 以上）",
+      "compareWeekTooltip": "第 {{week}} | 历史：{{actual}}% | 优化后：{{optimized}}%",
+      "weekTooltip": "第 {{week}} ：{{discount}}%",
+      "historicalVsOptimized": "上半部分 = 历史，下半部分 = 优化后"
+    },
+
+    "deepDive": {
+      "title": "深入分析",
+      "subtitle": "供分析师审核的 SKU 级明细",
+      "description": "促销 ROI = 每单位促销支出所产生的增量利润（推荐值与实际值对比）。",
+      "vs": "对比",
+      "baseMetric": "基准{{metric}}",
+      "actualMetric": "实际{{metric}}",
+      "optimalMetric": "最优{{metric}}",
+      "table": {
+        "sku": "SKU",
+        "baseProfit": "基准利润",
+        "actualProfit": "实际利润",
+        "gainVsActual": "相较实际值的增益",
+        "actualSpend": "实际支出",
+        "optimalSpend": "最优支出",
+        "promoRoi": "促销 ROI"
+      }
+    }
+  },
+
+  "actions": {
+    "continueToConfiguration": "继续配置",
+    "runOptimization": "运行优化",
+    "running": "运行中…",
+    "maximize": "最大化",
+    "restore": "还原",
+    "clear": "清除",
+    "matchActual": "设为实际值",
+    "customSplit": "自定义分配",
+    "apply": "应用",
+    "save": "保存",
+    "saving": "正在保存…",
+    "saveChanges": "保存更改",
+    "cancel": "取消",
+    "close": "关闭",
+    "reset": "重置",
+
+    "downloadExcel": "下载Excel"
+  },
+
+  "messages": {
+    "reviewHistoricalPicture": "已查看历史表现？接下来进入优化配置。",
+    "skusSelected": "已选择 {{count}} 个 SKU",
+    "skusSelected_one": "已选择 {{count}} 个SKU",
+    "skusSelected_other": "已选择 {{count}} 个SKU"
+  },
+
+  "common": {
+    "english": "英语",
+    "search": "搜索",
+    "noData": "暂无数据",
+    "loading": "加载中",
+    "loadingHistoricalData": "加载历史数据",
+    "defaultUser": "用户",
+    "signOut": "退出登录"
+  },
+
+  "footer": {
+    "copyright": "© {{year}} Philips 促销模拟器 | 版权所有。"
+  },
+
+  "stepper": {
+    "simulationSteps": "模拟步骤",
+    "completePreviousStepsFirst": "请先完成前面的步骤"
+  },
+
+  "errors": {
+    "somethingWentWrong": "发生了错误。",
+    "unexpected": "抱歉，发生了意外错误。",
+    "unknown": "未知错误",
+    "updateProjectFailed": "项目更新失败",
+    "missingProjectScenario": "未找到项目或场景。"
+  },
+
+  "access": {
+    "page": {
+      "home": "首页",
+      "description": "查看并申请 Promo Simulator 区域访问权限。",
+      "loading": "正在加载区域访问信息...",
+      "retry": "重试",
+      "myActiveRegions": "我的有效区域",
+      "approved": "已批准",
+      "noActiveRegions": "您目前没有任何区域访问权限。",
+      "requestedRegions": "申请区域",
+      "requestedMarket": "申请市场",
+      "requestedOn": "申请日期",
+      "pending": "待处理",
+      "noPendingRequest": "您目前没有待处理的访问申请。",
+      "noPreviousRequests": "未找到之前的访问申请。",
+      "regions": "区域",
+      "user": "用户",
+      "email": "邮箱",
+      "actions": "操作",
+      "action": "操作",
+      "requestDate": "申请日期",
+      "status": "状态",
+      "comment": "备注",
+      "accessRequired": "需要访问权限",
+      "accessRequiredMessage": "您没有此应用程序的访问权限。请提交访问申请。",
+      "accessRequests": "访问申请",
+      "noRequestFound": "未找到访问申请。"
+    },
+
+    "request": {
+      "pendingRequest": "待处理申请",
+      "requestRegionAccess": "申请区域访问权限",
+      "alreadyPending": "您已有一个待处理申请。当前申请审核完成后，才能提交新的申请。",
+      "noAdditionalRegions": "没有可申请的其他区域。",
+      "submitting": "正在提交...",
+      "submitRequest": "提交访问申请",
+      "requestHistory": "申请历史",
+      "loadFailed": "加载区域访问信息失败",
+      "submitFailed": "提交区域访问申请失败",
+      "pendingAlreadyExists": "您已有一个待处理的访问申请。",
+      "requestAccess": "申请访问权限",
+      "viewRequest": "查看申请",
+      "otherAccess": "+ 其他访问权限",
+      "submitSuccess": "访问申请已成功提交",
+      "submitSuccessCount": "已提交 {{count}} / 1 个访问申请",
+      "pendingReview": "您的申请正在审核中。请稍后再次查看状态。",
+      "accessGrantedForMarket": "已授予此市场的访问权限。",
+      "requestRejected": "申请已拒绝",
+      "requestNotApproved": "申请未获批准。"
+    },
+
+    "form": {
+      "region": "区域",
+      "country": "国家/地区",
+      "selectRegion": "选择区域",
+      "selectCountry": "选择国家/地区",
+      "selectMag": "选择 MAG",
+      "selectRetailer": "选择零售商",
+      "countryRequiresRegion": "选择区域后可选择国家/地区",
+      "magRequiresCountry": "选择国家/地区后可选择 MAG",
+      "retailerRequiresMAG": "选择 MAG 后可选择零售商",
+      "granted": "已授予"
+    },
+
+    "admin": {
+      "title": "区域访问管理",
+      "description": "审核和管理 Promo Simulator 区域访问权限。",
+      "pendingRequests": "待处理申请（{{count}}）",
+      "activeUsers": "有效用户（{{count}}）",
+      "deletedRequests": "已撤销申请（{{count}}）",
+      "loading": "正在加载区域访问管理信息...",
+      "noPendingRequests": "未找到待处理申请。",
+      "noActiveUsers": "未找到有效用户。",
+      "noRevokedAccess": "未找到已撤销的区域访问权限。",
+      "approve": "批准",
+      "reject": "拒绝",
+      "revoke": "撤销",
+      "revoking": "正在撤销...",
+      "accessDenied": "拒绝访问",
+      "notAuthorized": "您无权访问管理员页面。",
+      "backToHome": "返回首页",
+      "grantedDate": "授予日期",
+      "revokedDate": "撤销日期",
+      "revokedBy": "撤销人",
+      "revokeConfirmation": "确定要为该用户撤销 {{region}} 的访问权限吗？",
+      "requestApproved": "访问申请已成功批准",
+      "requestRejected": "访问申请已成功拒绝",
+      "regionAccessRevoked": "区域访问权限已成功撤销",
+      "loadFailed": "加载管理信息失败",
+      "approveFailed": "批准访问申请失败",
+      "rejectFailed": "拒绝访问申请失败",
+      "revokeFailed": "撤销区域访问权限失败"
+    }
+  },
+
+  "home": {
+    "createNewProject": "创建新项目",
+    "noProjectsYet": "暂无项目。",
+    "createYourFirstProject": "创建您的第一个项目",
+    "noDeletedItems": "暂无已删除项目。",
+    "newScenarioName": "新场景名称",
+    "createProjectModal": {
+      "close": "关闭弹窗",
+      "projectName": "项目名称",
+      "enterProjectName": "输入项目名称",
+      "selectMarket": "选择市场",
+      "selectMarketFirst": "请先选择市场",
+      "selectMagFirst": "请先选择 MAG",
+      "comingSoon": "即将推出",
+      "description": "描述",
+      "enterProjectDescription": "输入项目描述",
+      "createProject": "创建项目",
+      "creating": "正在创建..."
+    },
+    "tabs": {
+      "allProjects": "所有项目（{{count}}）",
+      "deletedItems": "已删除项目（{{count}}）"
+    },
+    "projectRow": {
+      "statusDraft": "草稿",
+      "statusCompleted": "已完成",
+      "statusFailed": "失败",
+      "statusRunning": "运行中",
+      "restoreProject": "恢复项目",
+      "deleteProjectPermanently": "永久删除项目",
+      "editProject": "编辑项目",
+      "deleteProject": "删除项目",
+      "restoreScenario": "恢复场景",
+      "renameScenario": "重命名场景",
+      "deleteScenario": "删除场景",
+      "deletePermanent": "永久删除场景",
+      "configSaved": "配置已保存",
+      "resultStored": "结果已保存",
+      "popups": {
+        "projectCreated": "项目已成功创建",
+        "projectCreateFailed": "创建项目失败",
+        "projectExists": "项目 \"{{name}}\" 已存在。",
+        "projectDeleted": "项目已成功删除",
+        "projectPermanentlyDeleted": "软删除失败后，项目已被永久删除",
+        "projectDeleteFailed": "删除项目失败",
+        "projectDeleteConflict": "项目删除请求与当前状态冲突。",
+        "projectRestoreFailed": "恢复项目失败",
+        "projectRestoreConflict": "项目恢复请求与当前状态冲突。",
+        "projectRestored": "项目已成功恢复",
+        "projectPermanentDeleteFailed": "永久删除项目失败",
+        "projectPermanentDeleteConflict": "项目永久删除请求与当前状态冲突。",
+        "projectUpdated": "项目已成功更新",
+        "scenarioAdded": "场景已成功添加",
+        "scenarioAddFailed": "添加场景失败",
+        "scenarioExists": "此项目中已存在场景 \"{{name}}\"。",
+        "scenarioRenamed": "场景已成功重命名",
+        "scenarioRenameFailed": "重命名场景失败",
+        "scenarioDeleted": "场景已成功删除",
+        "scenarioDeleteFailed": "删除场景失败",
+        "scenarioDeleteConflict": "场景删除请求与当前状态冲突。",
+        "scenarioPermanentDeleteFailed": "永久删除场景失败",
+        "scenarioPermanentDeleteConflict": "场景永久删除请求与当前状态冲突。",
+        "scenarioPermanentlyDeleted": "场景已被永久删除",
+        "scenarioRestoreFailed": "恢复场景失败",
+        "scenarioRestoreConflict": "场景恢复请求与当前状态冲突。",
+        "scenarioRestored": "场景已成功恢复"
+      }
+    },
+    "table": {
+      "scenario": "场景",
+      "market": "市场",
+      "mag": "MAG",
+      "retailer": "零售商",
+      "period": "期间",
+      "createdOn": "创建日期",
+      "updatedOn": "更新日期",
+      "actions": "操作"
+    },
+
+    "scenarioCount": "（{{count}} 个场景）",
+    "scenarioCount_one": "（{{count}} 个场景）",
+    "scenarioCount_other": "（{{count}} 个场景）",
+    "theme": "主题"
+  }
+}

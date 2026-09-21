@@ -1,0 +1,14 @@
+.card {
+  margin: 40px;
+  padding: 24px;
+  background: var(--critical-soft, #fef2f2);
+  color: var(--critical, #dc2626);
+  border: 1px solid var(--critical, #dc2626);
+  border-radius: 8px;
+  font-family: var(--sans, sans-serif);
+}
+
+.msg {
+  margin-top: 8px;
+  font-size: 13px;
+}

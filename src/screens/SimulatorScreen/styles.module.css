@@ -1,0 +1,42 @@
+.shell {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--sim-shell-bg);
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  border: 1px solid var(--sim-frame-border);
+  border-radius: 0 0 var(--ui-radius-lg) var(--ui-radius-lg);
+  margin: 0 4px 4px;
+  background: var(--sim-frame-bg);
+}
+
+.main {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.notFound {
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--muted);
+  gap: 12px;
+}
+
+.notFound button {
+  border: 0;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: underline;
+}

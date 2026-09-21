@@ -1,0 +1,55 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  code-checks:
+    name: Code Checks
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js v20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        id: step-eslint
+        run: |
+          set +e  # Disable immediate exit on error
+          npm run ci:lint
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          set -e  # Re-enable exit on error
+
+      - name: Upload ESLint report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: ./eslint-out.html
+
+      - name: Check ESLint report for errors
+        run: |
+         echo "Exit code from Run ESLint step: ${{ steps.step-eslint.outputs.exit_code }}"
+         if [ "${{ steps.step-eslint.outputs.exit_code }}" -ne 0 ]; then
+           echo "ESLint report has errors"
+           exit 1
+         fi
+
+      - name: Prepare test coverage report
+        run: npm run coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            ./coverage/index.html
+            ./coverage/base.css

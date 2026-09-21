@@ -1,0 +1,13 @@
+.vscode
+
+.git
+.github
+.gitignore
+
+.docker
+.kubernetes
+
+node_modules
+dist
+
+*.md

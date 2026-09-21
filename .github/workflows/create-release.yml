@@ -1,0 +1,33 @@
+name: Create Release
+on:
+  push:
+    branches:
+      - main
+      - 'hotfix/*'
+jobs:
+  build:
+    name: Create Release
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    # Skip merge conflict resolution commits on hotfix branches (e.g., merging main into hotfix for PR)
+    if: ${{ !(startsWith(github.ref, 'refs/heads/hotfix/') && startsWith(github.event.head_commit.message, 'Merge branch')) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.IT_EADI_API_MGMT_GIT_TOKEN }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.IT_EADI_API_MGMT_GIT_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+          draft: false
+          prerelease: false

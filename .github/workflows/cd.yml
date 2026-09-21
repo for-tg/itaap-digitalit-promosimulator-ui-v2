@@ -1,0 +1,696 @@
+name: CD Pipeline
+
+on:
+  release:
+    types:
+      - published
+
+env:
+  GITHUB_REPOSITORY_NAME: <GITHUB_REPOSITORY_NAME>
+  ECR_REGISTRY_URI: 762168133611.dkr.ecr.eu-west-1.amazonaws.com
+  ECR_REPOSITORY_PATH: <ECR_REPOSITORY_PATH>
+  AWS_REGION: eu-west-1
+  EKS_APPLICATION_PATH_DEV_ACC_PROD: <EKS_APPLICATION_PATH_DEV_ACC_PROD>
+  EKS_APPLICATION_PATH_TEST: <EKS_APPLICATION_PATH_TEST>
+
+jobs:
+  # ============================================================================
+  # Hotfix Detection: Determine if this release was created from a hotfix branch
+  # ============================================================================
+  detect-hotfix:
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    outputs:
+      is_hotfix: ${{ steps.check.outputs.is_hotfix }}
+      hotfix_branch: ${{ steps.check.outputs.hotfix_branch }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check if tag is from a hotfix branch
+        id: check
+        run: |
+          TAG_COMMIT=$(git rev-parse HEAD)
+          echo "Tag commit: $TAG_COMMIT"
+          
+          # Check if this commit exists on any hotfix/* branch
+          HOTFIX_BRANCH=$(git branch -r --contains "$TAG_COMMIT" | grep 'origin/hotfix/' | head -1 | tr -d ' ' | sed 's|origin/||')
+          
+          if [ -n "$HOTFIX_BRANCH" ]; then
+            echo "is_hotfix=true" >> "$GITHUB_OUTPUT"
+            echo "hotfix_branch=$HOTFIX_BRANCH" >> "$GITHUB_OUTPUT"
+            echo "🔥 Hotfix detected: $HOTFIX_BRANCH"
+          else
+            echo "is_hotfix=false" >> "$GITHUB_OUTPUT"
+            echo "hotfix_branch=" >> "$GITHUB_OUTPUT"
+            echo "✅ Normal release (from main)"
+          fi
+
+  # ============================================================================
+  # Dev Deployment — SKIPPED for hotfixes
+  # ============================================================================
+  Dev-Deployment:
+    name: DEV Deployment
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    environment: dev
+    needs: [detect-hotfix]
+    env:
+      EKS_NAMESPACE: <EKS_NAMESPACE>
+
+    if: ${{ startsWith(github.ref, 'refs/tags/') && needs.detect-hotfix.outputs.is_hotfix != 'true' }}
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_NON_PROD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_NON_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Authenticate Docker to ECR registry
+        run: aws ecr get-login-password | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY_URI }}
+
+      - name: Create env variable for image tag name
+        run: echo "IMAGE_TAG_NAME=${{ env.ECR_REGISTRY_URI }}/${{ env.ECR_REPOSITORY_PATH }}:${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+
+      - name: Build and push the Docker image to ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: .docker/Dockerfile
+          build-args: |
+            buildEnvironment=dev-acc-prod
+          push: true
+          tags: ${{ env.IMAGE_TAG_NAME }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Deploy application to EKS
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name itaap-non-prod
+          template=`cat .kubernetes/eks-deployment.yml | sed "s|{{resourceName}}|${{ env.GITHUB_REPOSITORY_NAME }}|g" | sed "s|{{deployNamespace}}|${{ env.EKS_NAMESPACE }}|g" | sed "s|{{imageTagName}}|${{ env.IMAGE_TAG_NAME }}|g" | sed "s|{{applicationPath}}|${{ env.EKS_APPLICATION_PATH_DEV_ACC_PROD }}|g" | sed "s|{{host}}|dev.apps.api.it.philips.com|g"`
+          echo "$template" | kubectl apply -f -
+
+  # ============================================================================
+  # Pre-deployment Safety Check: Block main releases if unmerged hotfixes in prod
+  # ============================================================================
+  pre-deploy-safety-check:
+    needs: [detect-hotfix, Dev-Deployment]
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    if: ${{ startsWith(github.ref, 'refs/tags/') && needs.detect-hotfix.outputs.is_hotfix != 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check for unmerged hotfix branches deployed to production
+        env:
+          GITHUB_TOKEN: ${{ secrets.IT_EADI_API_MGMT_GIT_TOKEN }}
+        run: |
+          set -e
+
+          echo ""
+          echo "============================================"
+          echo "  PRE-DEPLOYMENT SAFETY CHECK"
+          echo "  Scanning for unmerged hotfixes..."
+          echo "============================================"
+
+          git fetch --all --tags --force --prune
+
+          echo ""
+          echo "  Prod tags found:"
+          git tag -l "prod/*" --sort=-version:refname | while read t; do echo "    $t ($(git rev-parse --short "$t^{commit}"))"; done
+          echo ""
+
+          BLOCKERS=0
+          BLOCKER_LIST=""
+
+          HOTFIX_BRANCHES=$(git branch -r --list "origin/hotfix/*" | tr -d ' ')
+
+          if [ -z "$HOTFIX_BRANCHES" ]; then
+            echo "  No active hotfix branches found."
+            echo "  ✅ Safe to deploy."
+            echo "============================================"
+            exit 0
+          fi
+
+          for BRANCH in $HOTFIX_BRANCHES; do
+            BRANCH_NAME=${BRANCH#origin/}
+            echo ""
+            echo "  Checking: $BRANCH_NAME"
+
+            MERGED=$(git branch -r --merged origin/main | tr -d ' ' | grep -x "$BRANCH" || true)
+            if [ -n "$MERGED" ]; then
+              echo "    Merged to main: Yes ✅"
+              continue
+            fi
+            echo "    Merged to main: No"
+
+            BRANCH_TIP=$(git rev-parse "$BRANCH")
+            HAS_PROD_TAG=false
+            FOUND_TAG=""
+
+            for TAG in $(git tag -l "prod/*" --sort=-version:refname); do
+              TAG_COMMIT=$(git rev-parse "$TAG^{commit}" 2>/dev/null)
+              if git merge-base --is-ancestor "$TAG_COMMIT" "$BRANCH" 2>/dev/null; then
+                if ! git merge-base --is-ancestor "$TAG_COMMIT" origin/main 2>/dev/null; then
+                  HAS_PROD_TAG=true
+                  FOUND_TAG=$TAG
+                  break
+                fi
+              fi
+            done
+
+            if [ "$HAS_PROD_TAG" = true ]; then
+              echo "    Prod tag: Yes ($FOUND_TAG) 🚨"
+              echo "    Status: BLOCKER — deployed to production but NOT merged to main"
+              BLOCKERS=$((BLOCKERS + 1))
+              BLOCKER_LIST="$BLOCKER_LIST\n    - $BRANCH_NAME (tag: $FOUND_TAG)"
+            else
+              echo "    Prod tag: No ✅ (not deployed to production)"
+            fi
+          done
+
+          echo ""
+          echo "============================================"
+
+          if [ "$BLOCKERS" -gt 0 ]; then
+            echo "  🚨 DEPLOYMENT BLOCKED"
+            echo ""
+            echo "  $BLOCKERS unmerged hotfix(es) found that were released:"
+            echo -e "$BLOCKER_LIST"
+            echo ""
+            echo "  ACTION REQUIRED:"
+            echo "  Merge these hotfix branches to main BEFORE deploying."
+            echo "  Otherwise, the hotfix code will be OVERWRITTEN."
+            echo "============================================"
+            exit 1
+          else
+            echo "  ✅ Safe to deploy."
+            echo "  All hotfix branches checked — none blocking."
+            echo "============================================"
+          fi
+
+  # ============================================================================
+  # Test Deployment — Entry point for hotfixes (skips Dev)
+  # ============================================================================
+  Test-Deployment:
+    name: TEST Deployment
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    environment: test
+    needs: [detect-hotfix, Dev-Deployment, pre-deploy-safety-check]
+    env:
+      EKS_NAMESPACE: <EKS_NAMESPACE>
+
+    if: |
+      always() && startsWith(github.ref, 'refs/tags/') && (
+        needs.detect-hotfix.outputs.is_hotfix == 'true' ||
+        (needs.Dev-Deployment.result == 'success' && needs.pre-deploy-safety-check.result == 'success')
+      )
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_NON_PROD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_NON_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Authenticate Docker to ECR registry
+        run: aws ecr get-login-password | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY_URI }}
+
+      - name: Create env variable for image tag name
+        run: echo "IMAGE_TAG_NAME=${{ env.ECR_REGISTRY_URI }}/${{ env.ECR_REPOSITORY_PATH }}:${{ github.event.release.tag_name }}-test" >> $GITHUB_ENV
+
+      - name: Build and push the Docker image to ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: .docker/Dockerfile
+          build-args: |
+            buildEnvironment=test
+          push: true
+          tags: ${{ env.IMAGE_TAG_NAME }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Deploy application to EKS
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name itaap-non-prod
+          template=`cat .kubernetes/eks-deployment.yml | sed "s|{{resourceName}}|${{ env.GITHUB_REPOSITORY_NAME }}|g" | sed "s|{{deployNamespace}}|${{ env.EKS_NAMESPACE }}|g" | sed "s|{{imageTagName}}|${{ env.IMAGE_TAG_NAME }}|g" | sed "s|{{applicationPath}}|${{ env.EKS_APPLICATION_PATH_TEST }}|g" | sed "s|{{host}}|dev.apps.api.it.philips.com|g"`
+          echo "$template" | kubectl apply -f -
+
+  # ============================================================================
+  # Safety check before ACC: re-verify no unmerged hotfixes since test deployment
+  # ============================================================================
+  pre-deploy-safety-check-acc:
+    needs: [detect-hotfix, Test-Deployment]
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    if: ${{ startsWith(github.ref, 'refs/tags/') && needs.detect-hotfix.outputs.is_hotfix != 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check for unmerged hotfix branches deployed to production
+        env:
+          GITHUB_TOKEN: ${{ secrets.IT_EADI_API_MGMT_GIT_TOKEN }}
+        run: |
+          set -e
+          echo ""
+          echo "============================================"
+          echo "  PRE-DEPLOYMENT SAFETY CHECK (ACC)"
+          echo "  Scanning for unmerged hotfixes..."
+          echo "============================================"
+          git fetch --all --tags --force --prune
+          echo ""
+          echo "  Prod tags found:"
+          git tag -l "prod/*" --sort=-version:refname | while read t; do echo "    $t ($(git rev-parse --short "$t^{commit}"))"; done
+          echo ""
+          BLOCKERS=0
+          BLOCKER_LIST=""
+          HOTFIX_BRANCHES=$(git branch -r --list "origin/hotfix/*" | tr -d ' ')
+          if [ -z "$HOTFIX_BRANCHES" ]; then
+            echo "  No active hotfix branches found. ✅ Safe to deploy."
+            echo "============================================"
+            exit 0
+          fi
+          for BRANCH in $HOTFIX_BRANCHES; do
+            BRANCH_NAME=${BRANCH#origin/}
+            echo "  Checking: $BRANCH_NAME"
+            MERGED=$(git branch -r --merged origin/main | tr -d ' ' | grep -x "$BRANCH" || true)
+            if [ -n "$MERGED" ]; then
+              echo "    Merged to main: Yes ✅"
+              continue
+            fi
+            HAS_PROD_TAG=false
+            FOUND_TAG=""
+            for TAG in $(git tag -l "prod/*" --sort=-version:refname); do
+              TAG_COMMIT=$(git rev-parse "$TAG^{commit}" 2>/dev/null)
+              if git merge-base --is-ancestor "$TAG_COMMIT" "$BRANCH" 2>/dev/null; then
+                if ! git merge-base --is-ancestor "$TAG_COMMIT" origin/main 2>/dev/null; then
+                  HAS_PROD_TAG=true
+                  FOUND_TAG=$TAG
+                  break
+                fi
+              fi
+            done
+            if [ "$HAS_PROD_TAG" = true ]; then
+              echo "    Prod tag: Yes ($FOUND_TAG) 🚨 BLOCKER"
+              BLOCKERS=$((BLOCKERS + 1))
+              BLOCKER_LIST="$BLOCKER_LIST\n    - $BRANCH_NAME (tag: $FOUND_TAG)"
+            else
+              echo "    Prod tag: No ✅"
+            fi
+          done
+          if [ "$BLOCKERS" -gt 0 ]; then
+            echo ""
+            echo "  🚨 DEPLOYMENT TO ACC BLOCKED — $BLOCKERS unmerged hotfix(es) in production:"
+            echo -e "$BLOCKER_LIST"
+            echo "  Merge these hotfix branches to main BEFORE deploying."
+            echo "============================================"
+            exit 1
+          else
+            echo "  ✅ Safe to deploy to ACC."
+            echo "============================================"
+          fi
+
+  # ============================================================================
+  # ACC Deployment
+  # ============================================================================
+  Acc-Deployment:
+    name: ACC Deployment
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    environment: acc
+    needs: [detect-hotfix, Test-Deployment, pre-deploy-safety-check-acc]
+    env:
+      EKS_NAMESPACE: <EKS_NAMESPACE>
+
+    if: |
+      always() && startsWith(github.ref, 'refs/tags/') && (
+        (needs.detect-hotfix.outputs.is_hotfix == 'true' && needs.Test-Deployment.result == 'success') ||
+        (needs.Test-Deployment.result == 'success' && needs.pre-deploy-safety-check-acc.result == 'success')
+      )
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ACC }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ACC }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create env variable for image tag name
+        run: echo "IMAGE_TAG_NAME=${{ env.ECR_REGISTRY_URI }}/${{ env.ECR_REPOSITORY_PATH }}:${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Deploy application to EKS
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name itaap-acc
+          template=`cat .kubernetes/eks-deployment.yml | sed "s|{{resourceName}}|${{ env.GITHUB_REPOSITORY_NAME }}|g" | sed "s|{{deployNamespace}}|${{ env.EKS_NAMESPACE }}|g" | sed "s|{{imageTagName}}|${{ env.IMAGE_TAG_NAME }}|g" | sed "s|{{applicationPath}}|${{ env.EKS_APPLICATION_PATH_DEV_ACC_PROD }}|g" | sed "s|{{host}}|acc.apps.api.it.philips.com|g"`
+          echo "$template" | kubectl apply -f -
+
+      - name: Tag environment deployment
+        env:
+          GIT_TOKEN: ${{ secrets.IT_EADI_API_MGMT_GIT_TOKEN }}
+        run: |
+          if [ -z "$GIT_TOKEN" ]; then
+            echo "GIT_TOKEN not provided, skipping environment tagging"
+            exit 0
+          fi
+
+          TAG_NAME="acc/${{ github.event.release.tag_name }}"
+          echo "Creating environment tag: ${TAG_NAME}"
+
+          git config user.email "github-actions@philips.com"
+          git config user.name "GitHub Actions"
+          git remote set-url origin "https://x-access-token:${GIT_TOKEN}@github.com/${{ github.repository }}.git"
+
+          # Delete existing env tag if it exists (re-deploy scenario)
+          git tag -d "${TAG_NAME}" 2>/dev/null || true
+          git push origin ":refs/tags/${TAG_NAME}" 2>/dev/null || true
+
+          git tag -a "${TAG_NAME}" -m "acc deployment - ${{ github.event.release.tag_name }}"
+          git push origin "${TAG_NAME}"
+          echo "Tagged acc deployment: ${TAG_NAME}"
+
+  # ============================================================================
+  # Safety check before Prod: re-verify no unmerged hotfixes since acc deployment
+  # ============================================================================
+  pre-deploy-safety-check-prod:
+    needs: [detect-hotfix, Acc-Deployment]
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    if: ${{ startsWith(github.ref, 'refs/tags/') && needs.detect-hotfix.outputs.is_hotfix != 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check for unmerged hotfix branches deployed to production
+        env:
+          GITHUB_TOKEN: ${{ secrets.IT_EADI_API_MGMT_GIT_TOKEN }}
+        run: |
+          set -e
+          echo ""
+          echo "============================================"
+          echo "  PRE-DEPLOYMENT SAFETY CHECK (PROD)"
+          echo "  Scanning for unmerged hotfixes..."
+          echo "============================================"
+          git fetch --all --tags --force --prune
+          echo ""
+          echo "  Prod tags found:"
+          git tag -l "prod/*" --sort=-version:refname | while read t; do echo "    $t ($(git rev-parse --short "$t^{commit}"))"; done
+          echo ""
+          BLOCKERS=0
+          BLOCKER_LIST=""
+          HOTFIX_BRANCHES=$(git branch -r --list "origin/hotfix/*" | tr -d ' ')
+          if [ -z "$HOTFIX_BRANCHES" ]; then
+            echo "  No active hotfix branches found. ✅ Safe to deploy."
+            echo "============================================"
+            exit 0
+          fi
+          for BRANCH in $HOTFIX_BRANCHES; do
+            BRANCH_NAME=${BRANCH#origin/}
+            echo "  Checking: $BRANCH_NAME"
+            MERGED=$(git branch -r --merged origin/main | tr -d ' ' | grep -x "$BRANCH" || true)
+            if [ -n "$MERGED" ]; then
+              echo "    Merged to main: Yes ✅"
+              continue
+            fi
+            HAS_PROD_TAG=false
+            FOUND_TAG=""
+            for TAG in $(git tag -l "prod/*" --sort=-version:refname); do
+              TAG_COMMIT=$(git rev-parse "$TAG^{commit}" 2>/dev/null)
+              if git merge-base --is-ancestor "$TAG_COMMIT" "$BRANCH" 2>/dev/null; then
+                if ! git merge-base --is-ancestor "$TAG_COMMIT" origin/main 2>/dev/null; then
+                  HAS_PROD_TAG=true
+                  FOUND_TAG=$TAG
+                  break
+                fi
+              fi
+            done
+            if [ "$HAS_PROD_TAG" = true ]; then
+              echo "    Prod tag: Yes ($FOUND_TAG) 🚨 BLOCKER"
+              BLOCKERS=$((BLOCKERS + 1))
+              BLOCKER_LIST="$BLOCKER_LIST\n    - $BRANCH_NAME (tag: $FOUND_TAG)"
+            else
+              echo "    Prod tag: No ✅"
+            fi
+          done
+          if [ "$BLOCKERS" -gt 0 ]; then
+            echo ""
+            echo "  🚨 DEPLOYMENT TO PROD BLOCKED — $BLOCKERS unmerged hotfix(es) in production:"
+            echo -e "$BLOCKER_LIST"
+            echo "  Merge these hotfix branches to main BEFORE deploying."
+            echo "============================================"
+            exit 1
+          else
+            echo "  ✅ Safe to deploy to PROD."
+            echo "============================================"
+          fi
+
+  # ============================================================================
+  # Validate PR_REVIEWERS before deploying hotfix to Prod
+  # ============================================================================
+  hotfix-pr-reviewer-validation:
+    needs: [detect-hotfix, Acc-Deployment]
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    if: ${{ needs.detect-hotfix.outputs.is_hotfix == 'true' && needs.Acc-Deployment.result == 'success' }}
+    steps:
+      - name: Validate PR reviewer usernames
+        env:
+          GITHUB_TOKEN: ${{ secrets.IT_EADI_API_MGMT_GIT_TOKEN }}
+          PR_REVIEWERS: ${{ vars.PR_REVIEWERS }}
+        run: |
+          set -e
+
+          echo ""
+          echo "============================================"
+          echo "  HOTFIX PR REVIEWER VALIDATION"
+          echo "============================================"
+
+          if [ -z "$PR_REVIEWERS" ]; then
+            echo "  🚨 PR_REVIEWERS variable is NOT set."
+            echo ""
+            echo "  At least one reviewer is MANDATORY for hotfix PRs."
+            echo "  Set the PR_REVIEWERS repository variable (Settings → Secrets and variables → Actions → Variables)"
+            echo "  to comma-separated GitHub usernames (e.g., 'ops-lead-1,ops-lead-2')."
+            echo "============================================"
+            exit 1
+          fi
+
+          INVALID=0
+          IFS=',' read -ra REVIEWER_LIST <<< "$PR_REVIEWERS"
+          for REVIEWER in "${REVIEWER_LIST[@]}"; do
+            REVIEWER=$(echo "$REVIEWER" | xargs)
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/users/$REVIEWER")
+
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              echo "  🚨 '$REVIEWER' is NOT a valid GitHub user (HTTP $HTTP_STATUS)"
+              INVALID=$((INVALID + 1))
+            else
+              echo "  ✅ $REVIEWER (valid)"
+            fi
+          done
+
+          if [ "$INVALID" -gt 0 ]; then
+            echo ""
+            echo "  Fix the PR_REVIEWERS variable and re-run the pipeline."
+            echo "============================================"
+            exit 1
+          fi
+
+          echo "  All ${#REVIEWER_LIST[@]} reviewer(s) validated."
+          echo "============================================"
+
+  # ============================================================================
+  # Prod Deployment
+  # ============================================================================
+  Prod-Deployment:
+    name: PROD Deployment
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    environment: prod
+    needs: [detect-hotfix, Acc-Deployment, hotfix-pr-reviewer-validation, pre-deploy-safety-check-prod]
+    env:
+      EKS_NAMESPACE: <EKS_NAMESPACE>
+
+    if: |
+      always() && startsWith(github.ref, 'refs/tags/') && needs.Acc-Deployment.result == 'success' && (
+        needs.hotfix-pr-reviewer-validation.result == 'success' ||
+        needs.hotfix-pr-reviewer-validation.result == 'skipped'
+      ) && (
+        needs.pre-deploy-safety-check-prod.result == 'success' ||
+        needs.pre-deploy-safety-check-prod.result == 'skipped'
+      )
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create env variable for image tag name
+        run: echo "IMAGE_TAG_NAME=${{ env.ECR_REGISTRY_URI }}/${{ env.ECR_REPOSITORY_PATH }}:${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Deploy application to EKS
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name itaap-prod
+          template=`cat .kubernetes/eks-deployment.yml | sed "s|{{resourceName}}|${{ env.GITHUB_REPOSITORY_NAME }}|g" | sed "s|{{deployNamespace}}|${{ env.EKS_NAMESPACE }}|g" | sed "s|{{imageTagName}}|${{ env.IMAGE_TAG_NAME }}|g" | sed "s|{{applicationPath}}|${{ env.EKS_APPLICATION_PATH_DEV_ACC_PROD }}|g" | sed "s|{{host}}|apps.api.it.philips.com|g"`
+          echo "$template" | kubectl apply -f -
+
+      - name: Tag environment deployment
+        env:
+          GIT_TOKEN: ${{ secrets.IT_EADI_API_MGMT_GIT_TOKEN }}
+        run: |
+          if [ -z "$GIT_TOKEN" ]; then
+            echo "GIT_TOKEN not provided, skipping environment tagging"
+            exit 0
+          fi
+
+          TAG_NAME="prod/${{ github.event.release.tag_name }}"
+          echo "Creating environment tag: ${TAG_NAME}"
+
+          git config user.email "github-actions@philips.com"
+          git config user.name "GitHub Actions"
+          git remote set-url origin "https://x-access-token:${GIT_TOKEN}@github.com/${{ github.repository }}.git"
+
+          # Delete existing env tag if it exists (re-deploy scenario)
+          git tag -d "${TAG_NAME}" 2>/dev/null || true
+          git push origin ":refs/tags/${TAG_NAME}" 2>/dev/null || true
+
+          git tag -a "${TAG_NAME}" -m "prod deployment - ${{ github.event.release.tag_name }}"
+          git push origin "${TAG_NAME}"
+          echo "Tagged prod deployment: ${TAG_NAME}"
+
+  # ============================================================================
+  # Auto-create PR to merge hotfix back to main after successful Prod deployment
+  # ============================================================================
+  hotfix-auto-pr:
+    needs: [detect-hotfix, Prod-Deployment]
+    runs-on: [self-hosted, linux, x64, philips-code-hub, ubuntu-latest]
+    if: ${{ always() && needs.detect-hotfix.outputs.is_hotfix == 'true' && needs.Prod-Deployment.result == 'success' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.IT_EADI_API_MGMT_GIT_TOKEN }}
+      - name: Create PR to merge hotfix back to main
+        env:
+          GITHUB_TOKEN: ${{ secrets.IT_EADI_API_MGMT_GIT_TOKEN }}
+          PR_REVIEWERS: ${{ vars.PR_REVIEWERS }}
+        run: |
+          set -e
+          
+          HOTFIX_BRANCH="${{ needs.detect-hotfix.outputs.hotfix_branch }}"
+          REPO="${{ github.repository }}"
+          TAG="${{ github.ref_name }}"
+          
+          # Extract developer info from the latest commit
+          COMMIT_SHA=$(git rev-parse HEAD)
+          DEVELOPER_NAME=$(git log -1 --format='%an')
+          DEVELOPER_GH=$(curl -s \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO/commits/$COMMIT_SHA" \
+            | grep -o '"login": "[^"]*"' | head -1 | cut -d'"' -f4)
+          
+          if [ -n "$DEVELOPER_GH" ]; then
+            echo "Developer: $DEVELOPER_NAME (GitHub: $DEVELOPER_GH)"
+          else
+            echo "⚠️  Could not resolve developer's GitHub username."
+          fi
+          
+          PR_TITLE="fix: Merge $HOTFIX_BRANCH to main after Prod deployment $TAG"
+          PR_BODY="Auto-generated after successful Prod deployment of $TAG.\n\nPlease review and merge to ensure main includes the hotfix.\n\n- Hotfix branch: \`$HOTFIX_BRANCH\`\n- Release tag: \`$TAG\`\n- Developer: @$DEVELOPER_GH ($DEVELOPER_NAME)\n\n> **Action:** Ops Lead reviews for production safety, Developer coordinates merge."
+          
+          echo ""
+          echo "============================================"
+          echo "  HOTFIX: Creating PR to merge fix to main"
+          echo "============================================"
+          
+          PR_RESPONSE=$(curl -s -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO/pulls" \
+            -d "{\"title\":\"$PR_TITLE\",\"head\":\"$HOTFIX_BRANCH\",\"base\":\"main\",\"body\":\"$PR_BODY\"}")
+          
+          PR_URL=$(echo "$PR_RESPONSE" | grep -o '"html_url": "[^"]*pull[^"]*"' | head -1 | cut -d'"' -f4)
+          PR_NUMBER=$(echo "$PR_RESPONSE" | grep -o '"number": [0-9]*' | head -1 | cut -d' ' -f2)
+          
+          if [ -n "$PR_URL" ]; then
+            echo "  PR created successfully!"
+            echo "  $PR_URL"
+            
+            # Build assignee list: Ops reviewers + developer
+            ASSIGNEES=""
+            if [ -n "$PR_REVIEWERS" ]; then
+              IFS=',' read -ra REVIEWER_LIST <<< "$PR_REVIEWERS"
+              for REVIEWER in "${REVIEWER_LIST[@]}"; do
+                REVIEWER=$(echo "$REVIEWER" | xargs)
+                ASSIGNEES="${ASSIGNEES}\"${REVIEWER}\","
+              done
+            fi
+            if [ -n "$DEVELOPER_GH" ]; then
+              ASSIGNEES="${ASSIGNEES}\"${DEVELOPER_GH}\","
+            fi
+            ASSIGNEES=${ASSIGNEES%,}
+            
+            if [ -n "$ASSIGNEES" ]; then
+              curl -s -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/assignees" \
+                -d "{\"assignees\":[${ASSIGNEES}]}"
+              echo "  Assigned to: ${ASSIGNEES}"
+            fi
+            
+            # Request review from Ops reviewers
+            if [ -n "$PR_REVIEWERS" ]; then
+              OPS_REVIEWERS=""
+              IFS=',' read -ra REVIEWER_LIST <<< "$PR_REVIEWERS"
+              for REVIEWER in "${REVIEWER_LIST[@]}"; do
+                REVIEWER=$(echo "$REVIEWER" | xargs)
+                if [ "$REVIEWER" != "$DEVELOPER_GH" ]; then
+                  OPS_REVIEWERS="${OPS_REVIEWERS}\"${REVIEWER}\","
+                fi
+              done
+              OPS_REVIEWERS=${OPS_REVIEWERS%,}
+              
+              if [ -n "$OPS_REVIEWERS" ]; then
+                curl -s -X POST \
+                  -H "Authorization: token $GITHUB_TOKEN" \
+                  -H "Accept: application/vnd.github.v3+json" \
+                  "https://api.github.com/repos/$REPO/pulls/$PR_NUMBER/requested_reviewers" \
+                  -d "{\"reviewers\":[${OPS_REVIEWERS}]}"
+                echo "  Review requested from: ${OPS_REVIEWERS}"
+              fi
+            fi
+          else
+            echo "  ⚠️  Auto PR creation failed. Create manually:"
+            echo "  https://github.com/$REPO/compare/main...$HOTFIX_BRANCH"
+            echo ""
+            echo "  API Response: $PR_RESPONSE"
+          fi
+          echo "============================================"

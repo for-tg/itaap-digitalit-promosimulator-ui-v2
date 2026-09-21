@@ -1,0 +1,44 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.skuModal {
+  background: white;
+  width: 700px;
+  max-width: 90vw;
+  max-height: 70vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.skuModalHeader {
+  margin-bottom: 20px;
+}
+
+.skuGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 24px;
+}
+
+.skuGridItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.skuModalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}

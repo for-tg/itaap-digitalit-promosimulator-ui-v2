@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{resourceName}}-deployment"
+  namespace: {{deployNamespace}}
+  labels:
+    app: {{resourceName}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{resourceName}}
+  template:
+    metadata:
+      labels:
+        app: {{resourceName}}
+    spec:
+      containers:
+        - name: "{{resourceName}}-container"
+          image: {{imageTagName}}
+          imagePullPolicy: Always
+          resources:
+           requests:
+             memory: "256Mi"
+           limits:
+             memory: "512Mi"
+      nodeSelector:
+        kubernetes.io/os: linux
+        kubernetes.io/arch: amd64                        
+      restartPolicy: Always
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{resourceName}}-service"
+  namespace: {{deployNamespace}}
+  labels:
+    app: {{resourceName}}
+spec:
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: {{resourceName}}
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "{{resourceName}}-ingress"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  namespace: {{deployNamespace}}
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - {{host}}
+      secretName: itaap-tls-secret
+  rules:
+    - host: {{host}}
+      http:
+        paths:
+          - path: "{{applicationPath}}(/|$)(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: "{{resourceName}}-service"
+                port:
+                  number: 80

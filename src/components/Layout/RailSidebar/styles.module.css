@@ -1,0 +1,113 @@
+.rail {
+  background: var(--sim-rail-bg);
+  border-right: 1px solid var(--line, #e5e7eb);
+  padding: 10px;
+  overflow-y: auto;
+  width: 206px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* ── Historical KPI cards ── */
+.histCard {
+  background: var(--sim-card-bg);
+  border: 1px solid var(--sim-card-border);
+  border-radius: var(--ui-radius-md);
+  padding: 10px 11px;
+  margin-bottom: 0;
+  box-shadow: var(--ui-shadow-card);
+}
+
+.histLabel {
+  font-size: 11px;
+  color: var(--muted, #6b7280);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+}
+
+.histValue {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink, #111827);
+  margin-top: 4px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.histSub {
+  font-size: 11px;
+  color: var(--muted, #6b7280);
+  margin-top: 3px;
+}
+
+.positive {
+  color: var(--good, #16a34a);
+}
+
+.negative {
+  color: var(--critical, #dc2626);
+}
+
+/* ── Divider ── */
+.divider {
+  height: 1px;
+  background: var(--line, #e5e7eb);
+  margin: 8px 0;
+}
+
+/* ── Scope row ── */
+.scopeRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--muted, #6b7280);
+  padding: 2px 0;
+}
+
+.scopeRow b {
+  color: var(--ink, #111827);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* ── Optimized KPI cards (generic) ── */
+.card {
+  background: var(--sim-card-bg);
+  border: 1px solid var(--sim-card-border);
+  border-radius: var(--ui-radius-md);
+  padding: 10px 11px;
+  margin-bottom: 0;
+  box-shadow: var(--ui-shadow-card);
+}
+
+.cardLabel {
+  font-size: 9.5px;
+  color: var(--muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.cardValue {
+  font-size: 17px;
+  font-weight: 700;
+  margin-top: 4px;
+  color: var(--ink);
+}
+
+.delta {
+  font-size: 10.5px;
+  margin-top: 2px;
+  font-weight: 600;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+.up   { color: var(--good, #16a34a); }
+.down { color: var(--critical, #dc2626); }
+.flat { color: var(--muted, #6b7280); }
+

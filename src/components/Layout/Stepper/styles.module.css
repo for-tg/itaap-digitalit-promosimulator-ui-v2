@@ -1,0 +1,92 @@
+.stepper {
+  height: 38px;
+  background: var(--sim-stepper-bg);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  flex: none;
+  overflow-x: auto;
+}
+
+.stepGroup {
+  display: contents;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 100%;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.step:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.step:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.step.active {
+  color: var(--ink);
+}
+
+.num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  background: var(--line);
+  color: var(--muted);
+  flex: none;
+}
+
+.step.active .num {
+  background: var(--accent);
+  color: #fff;
+}
+
+.step.done .num {
+  background: var(--good-soft);
+  color: var(--good);
+  border: 1px solid var(--good);
+}
+
+.link {
+  height: 2px;
+  width: 30px;
+  background: var(--line);
+  flex: none;
+  margin: 0 2px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.lockNote {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  padding-left: 10px;
+}
+
+.lockNote::before {
+  content: '🔒';
+  display: inline-block;
+  margin-right: 5px;
+  font-size: 11px;
+  color: #b07f25;
+}
